@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OOP in C++ — Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f11;
+    --surface: #18181c;
+    --surface2: #1f1f25;
+    --border: #2a2a32;
+    --border2: #3a3a46;
+    --text: #e8e8f0;
+    --text2: #9090a8;
+    --text3: #606078;
+    --accent: #7c6ef5;
+    --accent2: #a594f9;
+    --green: #22c55e;
+    --green-bg: rgba(34,197,94,0.08);
+    --green-border: rgba(34,197,94,0.25);
+    --red: #ef4444;
+    --red-bg: rgba(239,68,68,0.08);
+    --red-border: rgba(239,68,68,0.25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(15,15,17,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem; height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .site-header h1 { font-size: 15px; font-weight: 500; letter-spacing: 0.02em; }
+  .site-header h1 span { color: var(--accent2); }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .score-pill {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 20px; padding: 4px 14px; color: var(--text2);
+  }
+  .score-pill span { color: var(--accent2); font-weight: 500; }
+  .progress-wrap { width: 140px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0%; transition: width 0.4s; }
+  .main { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .section-header { display: flex; align-items: center; gap: 10px; margin: 2.5rem 0 1rem; }
+  .section-header:first-child { margin-top: 1rem; }
+  .section-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+    color: var(--accent); background: rgba(124,110,245,0.1);
+    border: 1px solid rgba(124,110,245,0.25); border-radius: 4px;
+    padding: 3px 8px; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+  }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+  .section-title { font-size: 13px; color: var(--text3); white-space: nowrap; }
+  .q-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  .q-card:hover { border-color: var(--border2); }
+  .q-header { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
+  .q-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--accent); background: rgba(124,110,245,0.1);
+    border-radius: 5px; padding: 2px 8px; white-space: nowrap; margin-top: 1px;
+  }
+  .q-text { font-size: 15px; line-height: 1.55; }
+  pre.code {
+    background: #0a0a0d; border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.65; color: #c8c8e0;
+    white-space: pre-wrap; margin: 10px 0 12px;
+  }
+  .options { display: flex; flex-direction: column; gap: 6px; }
+  .opt {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 14px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 8px;
+    cursor: pointer; font-size: 14px; color: var(--text2);
+    text-align: left; transition: all 0.15s; line-height: 1.5; width: 100%;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .opt:hover:not(:disabled) { background: #25252e; border-color: var(--border2); color: var(--text); }
+  .opt:disabled { cursor: default; }
+  .opt-letter { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; color: var(--text3); min-width: 18px; margin-top: 1px; }
+  .opt.correct { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+  .opt.correct .opt-letter { color: var(--green); }
+  .opt.wrong { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
+  .opt.wrong .opt-letter { color: var(--red); }
+  .feedback { margin-top: 10px; font-size: 13px; padding: 9px 14px; border-radius: 8px; line-height: 1.55; display: none; }
+  .feedback.show { display: block; }
+  .feedback.correct { background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green); }
+  .feedback.wrong { background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red); }
+  .result-banner {
+    display: none; margin-top: 3rem; background: var(--surface);
+    border: 1px solid var(--border2); border-radius: 16px;
+    padding: 2.5rem; text-align: center;
+  }
+  .result-banner.show { display: block; }
+  .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 60px; font-weight: 500; color: var(--accent2); margin-bottom: 8px; }
+  .result-pct { font-size: 20px; color: var(--text2); margin-bottom: 8px; }
+  .result-msg { font-size: 15px; color: var(--text3); margin-bottom: 1.5rem; }
+  .retry-btn {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    padding: 11px 30px; font-size: 14px; font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .retry-btn:hover { opacity: 0.85; }
+  @media (max-width: 600px) {
+    .site-header { padding: 0 1rem; }
+    .progress-wrap { display: none; }
+    .main { padding: 1.5rem 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <h1>OOP in C++ <span>/ MCQ Quiz</span></h1>
+  <div class="header-right">
+    <div class="progress-wrap"><div class="progress-fill" id="progress"></div></div>
+    <div class="score-pill"><span id="score-num">0</span> / 50</div>
+  </div>
+</header>
+<main class="main" id="main"></main>
+<script>
+const sections = [
+  { title: "Fundamentals", range: [1,5] },
+  { title: "Encapsulation & Access Specifiers", range: [6,10] },
+  { title: "Constructors & Destructors", range: [11,15] },
+  { title: "Inheritance", range: [16,20] },
+  { title: "Polymorphism & Virtual Functions", range: [21,26] },
+  { title: "Function & Operator Overloading", range: [27,30] },
+  { title: "Advanced OOP Concepts", range: [31,37] },
+  { title: "Memory Management & Object Slicing", range: [38,41] },
+  { title: "Exceptions, Templates & Casting", range: [42,50] },
+];
+const questions = [
+  { q: "What is the primary goal of Object-Oriented Programming?", opts: ["To write code that executes faster than procedural programming.", "To model real-world entities as objects with data and behavior.", "To eliminate the use of functions and focus only on data.", "To make all data global for easier access."], ans: 1 },
+  { q: "Which of the following is NOT a fundamental principle of OOP?", opts: ["Encapsulation", "Inheritance", "Polymorphism", "Compilation"], ans: 3 },
+  { q: "A class in C++ is best described as:", opts: ["A specific instance of an object.", "A blueprint or template for creating objects.", "A function that operates on data.", "A built-in data type like int or float."], ans: 1 },
+  { q: "An object in C++ is:", opts: ["The blueprint from which classes are created.", "A member function of a class.", "A runtime instance of a class.", "A pointer to a memory address."], ans: 2 },
+  { q: "Which of the following is a correct way to define a class named Student with a public member variable name?", opts: ["class Student { private: string name; };", "struct Student { string name; };", "Student { public: string name; };", "class Student { public string name; };"], ans: 1 },
+  { q: "Encapsulation in C++ is achieved through:", opts: ["The use of global variables.", "The use of friend functions exclusively.", "The use of access specifiers (public, private, protected).", "The use of inline functions."], ans: 2 },
+  { q: "Members of a class declared as private are accessible by:", opts: ["Any function in the program.", "Only member functions and friend functions/classes of the same class.", "Only derived classes.", "Only the main() function."], ans: 1 },
+  { q: "What is the default access specifier for members of a class in C++?", opts: ["public", "private", "protected", "friend"], ans: 1 },
+  { q: "What is the default access specifier for members of a struct in C++?", opts: ["private", "public", "protected", "friend"], ans: 0 },
+  { q: "Which of the following correctly demonstrates data hiding?", opts: ["Making all data members public.", "Making data members private and providing public getter/setter functions.", "Using global variables to store object state.", "Declaring all member functions as inline."], ans: 1 },
+  { q: "A constructor is:", opts: ["A function that is called when an object goes out of scope.", "A special member function with the same name as the class, used for initialization.", "A function used to allocate memory for an object.", "Any function that is declared public."], ans: 1 },
+  { q: "A default constructor is:", opts: ["A constructor that takes no arguments.", "A constructor that takes exactly one argument.", "A constructor that is automatically provided by the compiler if no constructor is defined.", "Both a and c."], ans: 3 },
+  { q: "Which of the following is a correct signature for a copy constructor in a class MyClass?", opts: ["MyClass(MyClass* obj);", "MyClass(const MyClass &obj);", "MyClass(MyClass obj);", "void MyClass(MyClass &obj);"], ans: 1 },
+  { q: "A destructor is called when:", opts: ["An object is created.", "An object goes out of scope or delete is called on a dynamically allocated object.", "The delete keyword is used to remove a function.", "The program starts."], ans: 1 },
+  { q: "What is the output of the following code?", code: 'class Test {\npublic:\n    Test()  { cout << "A"; }\n    ~Test() { cout << "B"; }\n};\nint main() {\n    Test t;\n    return 0;\n}', opts: ["A", "B", "AB", "DA"], ans: 2 },
+  { q: "Inheritance in OOP allows a class to:", opts: ["Have multiple public interfaces.", "Acquire properties and behaviors from another class.", "Hide its data from other classes.", "Execute multiple functions simultaneously."], ans: 1 },
+  { q: "The class that is inherited from is called the:", opts: ["Derived class", "Subclass", "Child class", "Base class"], ans: 3 },
+  { q: "Which type of inheritance is represented by: class B : public A?", opts: ["Multiple Inheritance", "Multilevel Inheritance", "Single Inheritance", "Hierarchical Inheritance"], ans: 2 },
+  { q: "In C++, what is the difference between public, protected, and private inheritance?", opts: ["They change the access levels of the base class members in the derived class.", "They determine the size of the derived class object.", "They determine the order in which constructors are called.", "There is no difference; they are just syntactic sugar."], ans: 0 },
+  { q: "In class Derived : private Base, a public member of Base becomes ______ in Derived.", opts: ["public", "protected", "private", "Inaccessible"], ans: 2 },
+  { q: "Polymorphism literally means:", opts: ["One name, one form.", "One name, many forms.", "Many names, one form.", "Many names, many forms."], ans: 1 },
+  { q: "Which of the following is an example of compile-time polymorphism?", opts: ["Virtual Functions", "Function Overloading", "Pure Virtual Functions", "Abstract Classes"], ans: 1 },
+  { q: "A virtual function in C++:", opts: ["Can only be declared in a derived class.", "Allows a function to be overridden in a derived class and ensures the correct function is called through a base class pointer/reference.", "Is a function that cannot be inherited.", "Is the same as a pure virtual function."], ans: 1 },
+  { q: "What is the purpose of a virtual destructor?", opts: ["To allow the base class destructor to be called first.", "To ensure that the derived class destructor is called when deleting a base class pointer.", "To prevent the destructor from being called.", "To make the class abstract."], ans: 1 },
+  { q: "A pure virtual function is declared as:", opts: ["virtual void func() = 0;", "void func() = 0;", "pure void func();", "virtual void func() pure;"], ans: 0 },
+  { q: "A class containing a pure virtual function is called a(n):", opts: ["Concrete class", "Interface class", "Abstract class", "Final class"], ans: 2 },
+  { q: "Function overloading allows:", opts: ["Multiple functions with the same name but different parameters in the same scope.", "Multiple functions with the same name and same parameters in different scopes.", "Redefining a function in a derived class.", "Only one function to exist with a given name."], ans: 0 },
+  { q: "Which of the following is NOT a valid function overload?", opts: ["int add(int a, int b); and float add(float a, float b);", "int add(int a, int b); and int add(int a, int b, int c);", "int add(int a, int b); and float add(int a, int b); (different return type only)", "int add(int a, float b); and int add(float a, int b);"], ans: 2 },
+  { q: "Which operator cannot be overloaded in C++?", opts: ["+", "=", ":: (Scope Resolution)", "[]"], ans: 2 },
+  { q: "What is the keyword used to overload an operator?", opts: ["overload", "operator", "op", "virtual"], ans: 1 },
+  { q: "Multiple Inheritance in C++ is a feature where:", opts: ["A class can have multiple base classes.", "A base class can have multiple derived classes.", "A class can have multiple constructors.", "A function can be overloaded multiple times."], ans: 0 },
+  { q: "What is the 'diamond problem' in multiple inheritance?", opts: ["An issue where a derived class inherits from two classes that have a common base, leading to ambiguity.", "A problem with the syntax of diamond operators <>.", "A memory allocation issue.", "A problem with template specialization."], ans: 0 },
+  { q: "How can the diamond problem be resolved in C++?", opts: ["By using virtual inheritance.", "By using friend classes.", "By using private inheritance.", "By using const member functions."], ans: 0 },
+  { q: "A friend function:", opts: ["Is a member function of a class.", "Can access private and protected members of the class it is a friend of, but is not a member of that class.", "Is inherited by derived classes.", "Cannot be a global function."], ans: 1 },
+  { q: "The 'this' pointer in C++:", opts: ["Is a pointer to the class itself.", "Is an implicit pointer that points to the object for which a member function is called.", "Is a pointer to the base class object.", "Can be used to call static member functions."], ans: 1 },
+  { q: "A static member variable in a class:", opts: ["Is created for each object of the class.", "Is shared by all objects of the class.", "Cannot be modified.", "Can only be accessed by static member functions."], ans: 1 },
+  { q: "A static member function:", opts: ["Can access non-static member variables directly.", "Can be called using the class name and scope resolution operator, even without an object.", "Is a virtual function.", "Is called a constructor."], ans: 1 },
+  { q: "What is object slicing in C++?", opts: ["When a derived class object is assigned to a base class object, the derived part is 'sliced off'.", "When a program runs out of memory.", "When a destructor fails to deallocate memory.", "When a base class object is assigned to a derived class object."], ans: 0 },
+  { q: "Which of the following correctly demonstrates object slicing?", code: 'class Base    { public: int x; };\nclass Derived : public Base { public: int y; };\nint main() {\n    Derived d;\n    Base b = d;  // Slicing occurs here\n    return 0;\n}', opts: ["Derived d;", "Base b = d;", "Derived *ptr = &b;", "Base *ptr = &d;"], ans: 1 },
+  { q: "Which keyword is used to dynamically allocate memory for an object?", opts: ["alloc", "malloc", "new", "create"], ans: 2 },
+  { q: "Which keyword is used to deallocate memory allocated with new?", opts: ["free", "delete", "dealloc", "erase"], ans: 1 },
+  { q: "Exception handling in C++ is primarily used for:", opts: ["Optimizing code performance.", "Managing runtime errors gracefully without crashing the program.", "Creating new data types.", "Overloading operators."], ans: 1 },
+  { q: "Which of the following is the correct order of try-catch block usage?", opts: ["catch, throw, try", "throw, catch, try", "try, throw, catch", "try, catch, throw"], ans: 2 },
+  { q: "Templates in C++ allow for:", opts: ["Generic programming, enabling code to work with any data type.", "Creating multiple copies of the same class.", "Dynamic memory allocation.", "Only compile-time polymorphism."], ans: 0 },
+  { q: "Which of the following is a correct example of a function template declaration?", opts: ["template <typename T> T add(T a, T b) { return a + b; }", "template <class T> T add(T a, T b) { return a + b; }", "template <typename T, typename U> T add(T a, U b) { return a + b; }", "All of the above are valid."], ans: 3 },
+  { q: "Which cast is used for safely converting pointers between base and derived classes in a polymorphic hierarchy?", opts: ["static_cast", "reinterpret_cast", "dynamic_cast", "const_cast"], ans: 2 },
+  { q: "What is the output of the following code?", code: 'class A {\npublic:\n    void display()      { cout << "A"; }\n    virtual void show() { cout << "B"; }\n};\nclass B : public A {\npublic:\n    void display() { cout << "C"; }\n    void show()    { cout << "D"; }\n};\nint main() {\n    A *ptr = new B();\n    ptr->display();\n    ptr->show();\n    return 0;\n}', opts: ["A D", "C D", "A B", "C B"], ans: 0 },
+  { q: "What is the output of the following code?", code: 'class Base {\npublic:\n    Base()  { cout << "Base Constructor ";    }\n    ~Base() { cout << "Base Destructor ";     }\n};\nclass Derived : public Base {\npublic:\n    Derived()  { cout << "Derived Constructor "; }\n    ~Derived() { cout << "Derived Destructor ";  }\n};\nint main() {\n    Base *b = new Derived();\n    delete b;\n    return 0;\n}', opts: ["Base Constructor Derived Constructor Derived Destructor Base Destructor", "Derived Constructor Base Constructor Base Destructor Derived Destructor", "Base Constructor Derived Constructor Base Destructor", "Base Constructor Derived Constructor Derived Destructor"], ans: 2 },
+  { q: "Which of the following is TRUE about an abstract class in C++?", opts: ["It can be instantiated.", "It must contain at least one pure virtual function.", "It cannot contain any non-virtual functions.", "It is created using the abstract keyword."], ans: 1 },
+  { q: "What concept does the following code demonstrate?", code: 'class Shape {\npublic:\n    virtual double area() = 0;\n};\nclass Circle : public Shape {\n    double radius;\npublic:\n    Circle(double r) : radius(r) {}\n    double area() override { return 3.14 * radius * radius; }\n};\nclass Square : public Shape {\n    double side;\npublic:\n    Square(double s) : side(s) {}\n    double area() override { return side * side; }\n};', opts: ["Multiple Inheritance", "Function Overloading", "Runtime Polymorphism using an Abstract Class", "Operator Overloading"], ans: 2 },
+];
+
+const letters = ['a','b','c','d'];
+let answered = new Array(50).fill(false);
+let correct = 0;
+
+function getSection(i) {
+  for (const s of sections) if (i+1 >= s.range[0] && i+1 <= s.range[1]) return s;
+  return null;
+}
+
+function build() {
+  const main = document.getElementById('main');
+  let html = '';
+  let lastSec = null;
+  questions.forEach((q, i) => {
+    const sec = getSection(i);
+    if (sec && sec !== lastSec) {
+      const si = sections.indexOf(sec) + 1;
+      html += `<div class="section-header">
+        <span class="section-tag">Section ${si}</span>
+        <span class="section-title">${sec.title}</span>
+        <span class="section-line"></span>
+      </div>`;
+      lastSec = sec;
+    }
+    html += `<div class="q-card" id="qcard-${i}">
+      <div class="q-header">
+        <span class="q-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="q-text">${q.q}</span>
+      </div>`;
+    if (q.code) html += `<pre class="code">${q.code}</pre>`;
+    html += `<div class="options" id="opts-${i}">`;
+    q.opts.forEach((opt, oi) => {
+      html += `<button class="opt" id="opt-${i}-${oi}" onclick="choose(${i},${oi})">
+        <span class="opt-letter">${letters[oi]})</span>${opt}
+      </button>`;
+    });
+    html += `</div><div class="feedback" id="fb-${i}"></div></div>`;
+  });
+  html += `<div class="result-banner" id="result">
+    <div class="result-score" id="final-score">0/50</div>
+    <div class="result-pct" id="final-pct">0%</div>
+    <div class="result-msg" id="final-msg"></div>
+    <button class="retry-btn" onclick="retry()">Try Again</button>
+  </div>`;
+  main.innerHTML = html;
+}
+
+function choose(qi, oi) {
+  if (answered[qi]) return;
+  answered[qi] = true;
+  const q = questions[qi];
+  const isCorrect = oi === q.ans;
+  if (isCorrect) correct++;
+  document.getElementById(`opts-${qi}`).querySelectorAll('.opt').forEach((btn, idx) => {
+    btn.disabled = true;
+    if (idx === q.ans) btn.classList.add('correct');
+    else if (idx === oi && !isCorrect) btn.classList.add('wrong');
+  });
+  const fb = document.getElementById(`fb-${qi}`);
+  if (isCorrect) {
+    fb.className = 'feedback correct show';
+    fb.innerHTML = '✓ Correct!';
+  } else {
+    fb.className = 'feedback wrong show';
+    fb.innerHTML = `✗ Wrong — correct answer: <strong>${letters[q.ans]}) ${q.opts[q.ans]}</strong>`;
+  }
+  const done = answered.filter(Boolean).length;
+  document.getElementById('score-num').textContent = correct;
+  document.getElementById('progress').style.width = `${(done/50)*100}%`;
+  if (done === 50) showResult();
+}
+
+function showResult() {
+  const pct = Math.round((correct/50)*100);
+  const msg = pct>=90?'Outstanding performance! You mastered OOP.':pct>=70?'Good job! A few more reviews and you\'ll ace it.':pct>=50?'Not bad. Review the topics you missed.':'Keep studying. Practice makes perfect!';
+  document.getElementById('final-score').textContent = `${correct}/50`;
+  document.getElementById('final-pct').textContent = `${pct}%`;
+  document.getElementById('final-msg').textContent = msg;
+  const r = document.getElementById('result');
+  r.classList.add('show');
+  r.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function retry() {
+  answered = new Array(50).fill(false);
+  correct = 0;
+  document.getElementById('score-num').textContent = 0;
+  document.getElementById('progress').style.width = '0%';
+  build();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+build();
+</script>
+</body>
+</html>
